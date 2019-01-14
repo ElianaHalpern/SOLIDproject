@@ -1,6 +1,9 @@
 //
 // Created by eliana on 1/14/19.
 //
+#include <utility>
+
+using namespace std;
 
 #ifndef SOLIDPROJECT_STATE_H
 #define SOLIDPROJECT_STATE_H

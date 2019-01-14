@@ -2,6 +2,7 @@
 // Created by eliana on 1/14/19.
 //
 
+#include <sys/types.h>
 #include "Main.h"
 
 pthread_mutex_t mutex;

@@ -1,9 +1,10 @@
 //
 // Created by eliana on 1/14/19.
 //
-
+#include <sys/types.h>
 #include "FileCacheManager.h"
 
+//try to find the solution
 bool FileCacheManager::isExist(string problem) {
     try {
         pthread_mutex_lock(&mutex);
@@ -15,7 +16,7 @@ bool FileCacheManager::isExist(string problem) {
         return false;
     }
 }
-
+//if the solution exist- send it to the client
 string FileCacheManager::popSolution(string problem) {
     string solution;
     pthread_mutex_lock(&mutex);
@@ -24,7 +25,7 @@ string FileCacheManager::popSolution(string problem) {
     return solution;
 
 }
-
+// if there is no solution- create one and save it to the map
 void FileCacheManager::addSolution(string problem, string solution) {
     pthread_mutex_lock(&mutexFile);
     this->cacheFile.open("cache.txt");
