@@ -93,3 +93,4 @@ class Lexer {
 
 
 #endif //SOLIDPROJECT_LEXER_H
+//
