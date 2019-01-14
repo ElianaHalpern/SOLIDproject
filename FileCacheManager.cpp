@@ -4,20 +4,32 @@
 
 #include "FileCacheManager.h"
 
-bool server_side::FileCacheManager::isExist(const std::string &problem) const {
-    return problemsAndSolutions.find(problem) != problemsAndSolutions.end();
-}
-
-std::vector<std::string> server_side::FileCacheManager::popSolution(const std::string &problem) const {
-    return problemsAndSolutions.find(problem)->second;
-}
-
-bool server_side::FileCacheManager::addSolution(const std::string &problem,
-                                                const std::vector<std::string> &solution) {
-    if (isExist(problem)) {
-        return false;
-    } else {
-        problemsAndSolutions.insert({problem, solution});
+bool FileCacheManager::isExist(string problem) {
+    try {
+        pthread_mutex_lock(&mutex);
+        solutions.at(problem);
+        pthread_mutex_unlock(&mutex);
         return true;
+    } catch (exception &e) {
+        pthread_mutex_unlock(&mutex);
+        return false;
     }
+}
+
+string FileCacheManager::popSolution(string problem) {
+    string solution;
+    pthread_mutex_lock(&mutex);
+    solution = solutions.at(problem);
+    pthread_mutex_unlock(&mutex);
+    return solution;
+
+}
+
+void FileCacheManager::addSolution(string problem, string solution) {
+    pthread_mutex_lock(&mutexFile);
+    this->cacheFile.open("cache.txt");
+    this->cacheFile << problem + "\n";
+    this->cacheFile << solution + "\n";
+    this->cacheFile.close();
+    pthread_mutex_unlock(&mutexFile);
 }

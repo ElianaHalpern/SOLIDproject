@@ -6,24 +6,40 @@
 #define SOLIDPROJECT_FILECACHEMANAGER_H
 
 
-#include <string>
-#include <vector>
-#include <unordered_map>
+#include <fstream>
+#include <iostream>
 #include "CacheManager.h"
+#include <map>
+#include "MyParallelServer.h"
 
-namespace server_side {
-    class FileCacheManager : public CacheManager<std::string, std::vector<std::string>> {
-    private:
-        std::unordered_map<std::string, std::vector<std::string>> problemsAndSolutions;
-    public:
-        bool isExist(const std::string &problem) const override;
+using namespace std;
 
-        std::vector<std::string> popSolution(const std::string &problem) const override;
+class FileCacheManager : public CacheManager {
+private:
+    fstream cacheFile;
+    map<string, string> solutions;
 
-        bool addSolution(const std::string &problem,
-                         const std::vector<std::string> &solution) override;
-    };
-}
+public:
+    FileCacheManager() {
+        cacheFile.open("cache.txt", fstream::in | fstream::out | fstream::app);
+        string problem;
+        string solution;
+        while (getline(this->cacheFile, problem)) {
+            getline(this->cacheFile, solution);
+            solutions.insert(pair<string, string>(problem, solution));
+        }
+        cacheFile.close();
+    }
+
+    bool isExist(string problem) override;
+
+    string popSolution(string problem) override;
+
+    void addSolution(string problem, string solution) override;
+
+    ~FileCacheManager() = default;
+
+};
 
 
 #endif //SOLIDPROJECT_FILECACHEMANAGER_H

@@ -5,14 +5,15 @@
 #ifndef SOLIDPROJECT_CACHEMANAGER_H
 #define SOLIDPROJECT_CACHEMANAGER_H
 
-template<class Problem, class Solution>
+using namespace std;
+
 class CacheManager {
 public:
-    virtual bool isExist(const Problem &problem) const = 0;
+    virtual bool isExist(string problem) = 0;
 
-    virtual Solution popSolution(const Problem &problem) const = 0;
+    virtual string popSolution(string problem) = 0;
 
-    virtual bool addSolution(const Problem &problem, const Solution &solution) = 0;
+    virtual void addSolution(string problem, string solution) = 0;
 };
 
 #endif //SOLIDPROJECT_CACHEMANAGER_H

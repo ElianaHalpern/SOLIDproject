@@ -6,12 +6,20 @@
 #define SOLIDPROJECT_CLIENTHANDLER_H
 
 #include <iostream>
-#include "Server.h"
+#include "CacheManager.h"
 
-namespace server_side {
-    class ClientHandler {
-    public:
-        virtual void handleClient(int socket) = 0;
-    };
+using namespace std;
+
+class ClientHandler {
+protected:
+    CacheManager *cacheManager;
+
+public:
+    ClientHandler(CacheManager *cacheManager1) {
+        this->cacheManager = cacheManager1;
+    }
+
+    virtual void handleClient(int SockID) = 0;
 };
+
 #endif //SOLIDPROJECT_CLIENTHANDLER_H

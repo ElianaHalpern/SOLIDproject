@@ -2,48 +2,39 @@
 // Created by eliana on 1/14/19.
 //
 
-#include <cstring>
-#include <zconf.h>
+#include <sys/socket.h>
 #include "MyTestClientHandler.h"
 
-void server_side::MyTestClientHandler::handleClient(int sockID) {
-    int newSocket = sockID;
-    ssize_t n;
-    std::vector<std::string> buff;
-    std::string toMap = "";
-    char line[1024];
-    while (true) {
-        memset(line, 0, 1024);
-        n = read(newSocket, line, 1024);
-        if (!strcmp(line, "end"))
-            break;
-        line[n] = 0;
-        if (n == 0) {
-            close(newSocket);
-            break;
-        }
-        buff.emplace_back(line);
-        toMap += line;
-    }
+void MyTestClientHandler::handleClient(int sockID) {
+    char problem[256] = "";
+    string solution;
+    long n;
 
-    MatrixArgs args;
-    bool sendToClient = true;
-    if (m_cache->isExist(toMap)){
-        std::vector<std::string> answer = m_cache->getAnswer(toMap);
-        sendToClient = false;
-        for(std::string s : answer){
-            sendFunc(s,newSocket);
+    bzero(problem, 1024);
+    n = read(sockID, problem, 1023);
+    if (n < 0) {
+        perror("ERROR. cant read from socket");
+        exit(1);
+    }
+    while (strcmp(problem, "end") != 0) {
+        if (cacheManager->isExist(problem)) {
+            solution = cacheManager->popSolution(problem);
+        } else {
+            solution = solver->solve(problem);
+            cacheManager->addSolution(problem, solution);
+        }
+
+        if(::send(sockID, solution.data(), solution.size(),0) < 0){
+            perror("ERROR. cant write to socket");
+            exit(1);
+        }
+
+        bzero(problem, 1024);
+        n = read(sockID, problem, 1023);
+        if (n < 0) {
+            perror("ERROR reading from socket");
+            exit(1);
         }
     }
-    if (sendToClient){
-        args = m_lexer->FullLexer(buff);
-        MatrixSearcher *problem =
-                new MatrixSearcher(args.matrix,args.startPos,args.goalPos);
-        std::vector<std::string> solutions;
-        solutions = m_solver->solve(problem);
-        m_cache->addAnswerAndQuestion(toMap,solutions);
-        for(std::string s : solutions){
-            sendFunc(s,newsockfd);
-        }
-    }
+    //מה קורה כשהלולאה נגמרת? קריאה לstop
 }
